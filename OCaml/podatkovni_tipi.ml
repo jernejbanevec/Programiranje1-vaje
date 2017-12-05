@@ -1,5 +1,7 @@
 (* Vojne čarodejov se nadaljujejo. *)
 
+(* brezvezn komit vaja *)
+
 (* Čarodeji; ki se borijo v vojnah so pripadniki teh treh ras.  *)
 type race = Orc | Hobbit | Human
 
