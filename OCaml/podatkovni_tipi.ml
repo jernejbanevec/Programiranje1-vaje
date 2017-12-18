@@ -96,14 +96,35 @@ let rec strongest_wizard (wizards : wizard list) : wizard option =
    glede na funkcijo max.
 *)
 
-let rec max_list max_f l =
+(*let rec max_list max_f l=
 	match l with
 	| [] -> None
-	| [x] -> Some x
-	| x::y::tl -> 
+	| x :: [] -> Some x
+	| x::xs -> 
 		let new_list = (max_f x y)::tl in
-		max_list max_f new_list
+		max_list max_f new_list*)   (* TKO SI TI SPISOU *)
 
+		
+(*let rec max_list (max_f: 'a -> 'a -> 'a) (l: a' list) : 'a option =
+	match l with
+	| [] -> None
+	| x::l -> 
+	  begin match max_list max_f l with
+        | None -> Some x
+        | Some y ->
+          Some (max x y)
+      end *)
+let rec max_list (xs : 'a list) (max : 'a -> 'a -> 'a) : 'a option =
+  match xs with
+  | [] -> None
+  | x :: xs ->
+    begin match max_list xs max with
+      | None -> Some x
+      | Some y ->
+        Some (max x y)
+    end
+		
+		
 let max_list3 max_f l = 
 	match l with
 	| [] -> None
@@ -123,8 +144,18 @@ type vulnerability = High | Normal | Low
    Sicer vrne Normal
 *)
 
-let set_vulnerability wizard spell=
+(* let set_vulnerability wizard spell=
 	match (wizard.race, school_of_spell spell) with
+	| (Orc,Necrotic) -> Low
+	| (Hobbit,Fire) -> Low
+	| (Human,Angelic) -> Low
+	| (Hobbit,Necrotic) -> High
+	| (Human,Fire) -> High
+	| (Orc,Angelic) -> High
+	| (_,_) -> Normal *) (* SAMO PREKOPIRAL NA SPODNJO *)
+
+let effectiveness (school : school) (race : race) : vulnerability =
+	match (race, school) with
 	| (Orc,Necrotic) -> Low
 	| (Hobbit,Fire) -> Low
 	| (Human,Angelic) -> Low
@@ -133,13 +164,11 @@ let set_vulnerability wizard spell=
 	| (Orc,Angelic) -> High
 	| (_,_) -> Normal
 
-(* let effectiveness (school : school) (race : race) : vulnerability :
-...
-*)
 
 (* Zapiši funkcijo; ki za čarodeja izračuna njegovo občutljivost na podani urok. *)
 
-let vulnerable = failwith "todo"
+(*let vulnerable spell wizard= effectiveness (mana_of_spell spell) wizard.race *)
+	
 
 
 (* Občutljivost se v boju izrazi kot koeficient škode; ki jo utrpi čarodej; če ga urok zadane.
@@ -163,14 +192,14 @@ let vulnerable = failwith "todo"
 
 (* Napiši funkcijo; ki za danega čarovnika izvršuje uroke; dokler ne izvede vseh urokov
    na seznamu; ali pa mu zmanjka točk mane. *)
-let cast_spells wizard = wizard * spell list = failwith "todo"
+(*let cast_spells wizard = wizard * spell list = failwith "todo"*)
 
 
 (* Napiši funkcijo; ki simulira spopad dveh čarodejev. V primeru; ko napadalec ne more izvršiti
    nobenega uroka; napadalec izgubi. V nasprotnem primeru uporabi vse uroke; ki jih lahko.
    Če branilcu zmanjka življenskih točk; izgubi; sicer pa se vlogi napadalca in branilca zamenjata.
 *)
-let rec duel (attacker : wizard) (defender : wizard) : wizard =
-  failwith "todo"
+(*let rec duel (attacker : wizard) (defender : wizard) : wizard =
+  failwith "todo"*)
 
-let _ = duel frodo snoop_dogg
+(*let _ = duel frodo snoop_dogg*)
