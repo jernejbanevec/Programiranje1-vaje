@@ -138,6 +138,7 @@ let set_vulnerability wizard spell=
 *)
 
 (* Zapiši funkcijo; ki za čarodeja izračuna njegovo občutljivost na podani urok. *)
+
 let vulnerable = failwith "todo"
 
 

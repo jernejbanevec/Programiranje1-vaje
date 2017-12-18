@@ -73,7 +73,13 @@ let map_tlrec f l =
  - : int list = [0; 1; 2; 5; 6; 7]
  ---------- *)
 
-let mapi f l = ()
+let rec mapi f l = 
+	let rec mapi_aux f l n acc =
+		match l with
+		| [] -> reverse acc
+		| hd :: tl -> mapi_aux f tl (n+1) ((f (n) hd) :: acc) 
+		in mapi_aux f l 0 []
+		
 
 (* Funkcija "zip l1 l2" sprejme seznama l1 = [l1_0; l1_1; l1_2; ...] in
  l2 = [l2_0; l2_1; l2_2; ...] in vrne seznam [(l1_0,l2_0); (l1_1,l2_1); ...].
@@ -85,7 +91,8 @@ let mapi f l = ()
  Exception: Failure "Seznama razlicnih dolzin.".
  ---------- *)
 
-let zip l1 l2 = ()
+let zip l1 l2 = 
+	if List.length l1 = List.length l2 then List.combine l1 l2 else failwith "Seznama razlicnih dolzin."
 
 (* Funkcija "zip_enum_tlrec l1 l2" sprejme seznama l1 = [l1_0; l1_1; l1_2; ...] 
  in l2 = [l2_0; l2_1; l2_2; ...] in vrne [(0, l1_0, l2_0); (1, l1_1, l2_1); ...].
@@ -96,8 +103,25 @@ let zip l1 l2 = ()
  - : (int * string * int) list = [(0, "a", 7); (1, "b", 3); (2, "c", 4); (3, "d", 2)]
  ---------- *)
 
-let zip_enum_tlrec l1 l2 = ()
+(*let zip_enum_tlrec l1 l2 = 
+	let rec zip_enum_tlrec_aux l1 l2 n acc =
+		match (l1, l2) with
+		| ([], []) -> reverse acc
+		| ([],_) | (_,[]) -> failwith "Seznama razlicnih dolcin"
+		| (hd1 :: tl1, hd2 :: tl2) -> zip_enum_tlrec_aux l1 l2 (n+1) ((n, hd1, hd2) :: acc) 
+		in zip_enum_tlrec_aux l1 l2 0 [] *)  (*TA KODA SAMO NE DELA, NE POZNAM VZROKA*)
 
+let zip_enum_tlrec l1 l2 =
+  let rec zip_enum_aux l1 l2 index acc =
+    match (l1, l2) with
+    | ([],[]) -> reverse acc
+    | (_,[]) | ([],_) -> failwith("Seznama razlicnih dolzin.")
+    | (hd1::tl1,hd2::tl2) ->
+      let new_head = (index,hd1,hd2) in
+      zip_enum_aux tl1 tl2 (index+1) (new_head::acc)
+  in
+zip_enum_aux l1 l2 0 [] 		
+		
 (* Funkcija "unzip l" sprejme seznam l = [(a0, b0); (a1, b2); ...]
  in vrne dvojico seznamov ([a0; a1; ...], [b0; b1; ...]).
  ----------
@@ -105,7 +129,8 @@ let zip_enum_tlrec l1 l2 = ()
  - : int list * string list = ([0; 1; 2], ["a"; "b"; "c"])
  ---------- *)
 
-let unzip l = ()
+let unzip l = 
+	List.split l
 
 (* Funkcija "unzip_tlrec l" je tail-recursive verzija funkcije unzip.
  ----------
@@ -113,7 +138,14 @@ let unzip l = ()
  - : int list * string list = ([0; 1; 2], ["a"; "b"; "c"])
  ---------- *)
 
-let unzip_tlrec l = ()
+let unzip_tlrec l =
+	let rec unzip_tlrec_aux l acc1 acc2 =
+	match l with
+	| [] -> (reverse acc1, reverse acc2)
+	| hd :: tl -> let (a1, a2) = hd in
+					unzip_tlrec_aux tl (a1 :: acc1) (a2 :: acc2)
+	in
+unzip_tlrec_aux l [] [] 
 
 (* Funkcija "fold_left_no_acc f l" sprejme seznam l = [l0; l1; l2; ...; ln] in funkcijo f,
  vrne pa f(... (f (f (f l0 l1) l2) l3) ... ln).
