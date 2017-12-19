@@ -155,15 +155,37 @@ let rec is_bst t =
 - : bool = false
    ---------- *)
 
-let rec insert x bst = ()
-
-let rec member x bst = ()
+let rec insert x = function
+	| Empty -> leaf x
+	| Node(l, y, d) -> 
+			if x > y then Node(l, y, insert x d)
+			else if x = y then Node(l, y, d)
+			else Node(insert x l, y, d)
+			
+			
+	(* DRUGAČEN NAČIN *)		
+(*let rec insert x = function
+	| Empty -> leaf x
+	| Node(l, y, d) as t -> 
+			if x > y then Node(l, y, insert x d)
+			else if x = y then t
+			else Node(insert x l, y, d) *)
+			
+			
+let rec member x = function
+	| Empty -> false
+	| Node(l, y, d) -> 
+			if x = y then true
+			else if x > y then member x d
+			else member x l
 
 (* Napiši še funkcijo "member2", kjer ne privzameš, da je drevo bst.
    Premisli kakšna je časovna zahtevnost funkcije "member" in kakšna funkcije
    "member2" na drevesu z n vozlišči, ki ima globino log(n). *)
 
-let rec member2 x t = ()
+let rec member2 x = function
+	| Empty -> false
+	| Node(l, y, d) -> x=y || member2 x l || member2 x d
 
 (* Funkcija "bst_of_list l" ['a list -> 'a tree] iz seznama naredi binarno
    iskalno drevo.

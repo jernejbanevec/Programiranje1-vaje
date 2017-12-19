@@ -96,13 +96,13 @@ let rec strongest_wizard (wizards : wizard list) : wizard option =
    glede na funkcijo max.
 *)
 
-(*let rec max_list max_f l=
+let rec max_list (max_f : 'a -> 'a -> 'a)(l : 'a list): 'a option=
 	match l with
 	| [] -> None
 	| x :: [] -> Some x
-	| x::xs -> 
-		let new_list = (max_f x y)::tl in
-		max_list max_f new_list*)   (* TKO SI TI SPISOU *)
+	| x::y::xs -> 
+		let new_list = (max_f x y)::xs in
+		max_list max_f new_list (* TKO SI TI SPISOU *)
 
 		
 (*let rec max_list (max_f: 'a -> 'a -> 'a) (l: a' list) : 'a option =
@@ -114,7 +114,8 @@ let rec strongest_wizard (wizards : wizard list) : wizard option =
         | Some y ->
           Some (max x y)
       end *)
-let rec max_list (xs : 'a list) (max : 'a -> 'a -> 'a) : 'a option =
+	  
+(*let rec max_list (xs : 'a list) (max : 'a -> 'a -> 'a) : 'a option =
   match xs with
   | [] -> None
   | x :: xs ->
@@ -122,13 +123,13 @@ let rec max_list (xs : 'a list) (max : 'a -> 'a -> 'a) : 'a option =
       | None -> Some x
       | Some y ->
         Some (max x y)
-    end
+    end *)
 		
 		
 let max_list3 max_f l = 
 	match l with
 	| [] -> None
-	| hd :: tl -> Some (List.fold_left max_f hd l)
+	| hd :: tl -> Some (List.fold_left max_f hd tl)
 	
 (* Rase imajo različno občutljivost [vulnerability] na določene šole magije.
    Napiši tip s katerim lahko izraziš kdaj ima rasa visoko [High]; navadno [Normal]
@@ -167,7 +168,7 @@ let effectiveness (school : school) (race : race) : vulnerability =
 
 (* Zapiši funkcijo; ki za čarodeja izračuna njegovo občutljivost na podani urok. *)
 
-(*let vulnerable spell wizard= effectiveness (mana_of_spell spell) wizard.race *)
+let vulnerable spell wizard= effectiveness (school_of_spell spell) wizard.race 
 	
 
 
@@ -175,7 +176,12 @@ let effectiveness (school : school) (race : race) : vulnerability =
    Zapiši funkcijo; ki glede na občutljivost vrne primeren koeficient; tako da čarodej z nizko
    občutljivostjo utrpi le pol škode; čarodej z visoko občutljivostjo pa dvakratnik.*)
 
-
+let coef = function
+	| Low -> 0.5
+	| High -> 2.
+	| Normal -> 1.
+	
+   
 (* Vsak urok naredi toliko škode; kot je potrebnih točk mane za izvršitev uroka.
    Napiši funkcijo; ki glede na urok in čarodeja izračuna koliko škode utrpi;
    če ga urok zadane.
@@ -183,12 +189,19 @@ let effectiveness (school : school) (race : race) : vulnerability =
    int_of_float.
 *)
 
+let narejena_skoda spell (target : wizard) : int =
+	match effectiveness (school_of_spell spell) target.race with
+	| x -> int_of_float ((coef x) *. float_of_int (mana_of_spell spell))
+
 
 (* Zapiši funkcijo; ki vrne novo stanje čarodeja (z znižanimi življenskimi točkami [hp]);
    po tem; ko ga je zadel izbrani urok.
    (Novo stanje čarodeja je prav tako tipa wizard)
 *)
 
+(*let Wizard_after wizard spell = {wizard with hp = wizard.hp - narejena_skoda spell wizard}*)
+
+let attack wizard spell = {wizard with hp = wizard.hp - (narejena_skoda spell wizard)}
 
 (* Napiši funkcijo; ki za danega čarovnika izvršuje uroke; dokler ne izvede vseh urokov
    na seznamu; ali pa mu zmanjka točk mane. *)
