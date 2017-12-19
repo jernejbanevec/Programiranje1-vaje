@@ -20,7 +20,7 @@ let tretji = failwith "dopolni me"
 
 (* 1.5) Definirajte funkcijo, ki vzame dve funkciji ter vrne njun kompozitum.
    Primer: /kompozitum succ string_of_int 5 = "6"/ *)
-let kompozitum = failwith "dopolni me"
+let kompozitum f g x = g ( f x);;
 
 
 (* ======================================= *)

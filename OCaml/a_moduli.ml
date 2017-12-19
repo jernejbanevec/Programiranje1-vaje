@@ -141,14 +141,22 @@ module type COMPLEX = sig
 (* Napiši kartezično implementacijo kompleksnih števil (torej z = x + iy).
    Deljenje je zahtevnejše, zato si ga lahko s 'failwith' trikom pustiš za kasneje.
  *)
+
+
  
-(*
+
 module Cartesian : COMPLEX = struct
   type t = {re : float; im : float}
-  let eq x y = x.re = y.re && ...
-  ...
+  let eq x y = x.re = y.re && x.im = y.im
+  let zero = {re = 0.; im = 0.}
+  let one = {re = 1.; im = 0.}
+  let i = {re = 0.; im = 1.}
+  let neg x = {re = 0. -. x.re; im = 0. -. x.im}
+  let konj x = {re = x.re; im = -. x.im}
+  let add x y = {re = x.re +. y.re; im = x.im +. y.im}
+  let mult = failwith "later"
 end
- *)
+ 
 
 
 (* Sedaj napiši še polarno implementacijo kompleksnih števil (torej z = r e^(i*fi) ).
