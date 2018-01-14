@@ -20,7 +20,7 @@ let test_matrix = [| [| 1 ; 2 ; 0 |];
 let rec max_cheese = function
 	| [||] -> 0
 	| [|a|] -> a
-	| [|hd;tl|] -> [|hd|].(0).(0) + (max_cheese [|tl|])
+	| [|hd;tl|] -> [|hd|].(0).(0) + max (max_cheese [|tl|]) (max_cheese)
 
 (* Rešujemo problem stolpov, ko smo ga spoznali na predavanjih.
    Imamo štiri različne tipe gradnikov, dva modra in dva rdeča.
