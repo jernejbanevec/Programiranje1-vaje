@@ -17,7 +17,10 @@ let test_matrix = [| [| 1 ; 2 ; 0 |];
                      [| 2 ; 4 ; 5 |];
                      [| 7 ; 0 ; 1 |]  |]
 
-let max_cheese cheese_matrix = ()
+let rec max_cheese = function
+	| [||] -> 0
+	| [|a|] -> a
+	| [|hd;tl|] -> [|hd|].(0).(0) + (max_cheese [|tl|])
 
 (* Rešujemo problem stolpov, ko smo ga spoznali na predavanjih.
    Imamo štiri različne tipe gradnikov, dva modra in dva rdeča.
@@ -33,3 +36,6 @@ let max_cheese cheese_matrix = ()
    ---------- *)
 
 let alternating_towers height = ()
+
+
+(* #use "dinamicno_programiranje.ml";; *)
