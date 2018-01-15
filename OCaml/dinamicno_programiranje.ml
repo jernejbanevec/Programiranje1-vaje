@@ -37,7 +37,7 @@ let rec max_cheese cheese_matrix =
 	in
 	pozeruh 0 0
 
-let rec max_cheese2 cheese_matrix =
+(*let rec max_cheese2 cheese_matrix =
 	let max_v = Array.length cheese_matrix - 1 in
 	let max_s = Array.length cheese_matrix.(0) - 1 in
 	
@@ -55,7 +55,7 @@ let rec max_cheese2 cheese_matrix =
 				let dol = pozeruh (v+1) s in
 				cheese_matrix.(v).(s) + max desno dol
 	in
-	pozeruh_odviti pozeruh 0 0	
+	pozeruh_odviti pozeruh 0 0	*)
 	
 (* Rešujemo problem stolpov, ko smo ga spoznali na predavanjih.
    Imamo štiri različne tipe gradnikov, dva modra in dva rdeča.
