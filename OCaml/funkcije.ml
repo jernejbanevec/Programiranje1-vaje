@@ -144,8 +144,7 @@ let unzip_tlrec l =
 	| [] -> (reverse acc1, reverse acc2)
 	| hd :: tl -> let (a1, a2) = hd in
 					unzip_tlrec_aux tl (a1 :: acc1) (a2 :: acc2)
-	in
-unzip_tlrec_aux l [] [] 
+	in unzip_tlrec_aux l [] [] 
 
 (* Funkcija "fold_left_no_acc f l" sprejme seznam l = [l0; l1; l2; ...; ln] in funkcijo f,
  vrne pa f(... (f (f (f l0 l1) l2) l3) ... ln).
@@ -155,7 +154,13 @@ unzip_tlrec_aux l [] []
  - : string = "FIKUS"
  ---------- *)
 
-let fold_left_no_acc f l = ()
+let fold_left_no_acc1 f l = List.fold_left f "" l
+
+let rec fold_left_no_acc f l =
+	match l with
+	| []|[_] -> failwith "Seznam z manj kot dvema elementoma."
+	| a :: b :: [] -> f a b
+	| hd1 :: hd2 :: tl -> fold_left_no_acc f ((f hd1 hd2)::tl)
 
 (* Funkcija "apply_sequence f x n" vrne seznam zaporednih uporab funkcije f na x,
  [x; f x; f (f x); ...; f uporabljena n-krat na x].
@@ -167,7 +172,12 @@ let fold_left_no_acc f l = ()
  - : int list = []
  ---------- *)
 
-let apply_sequence f x n = ()
+let apply_sequence f x n = 
+	let rec apply_sequence_aux f x n acc =
+		match n with
+		| 0 -> reverse acc
+		| n -> apply_sequence_aux f (f x) (n-1) ((f x) :: acc)
+	in apply_sequence_aux f x n []
 
 (* Funkcija "filter f l" sprejme seznam l in vrne seznam elementov l,
  za katere funkcija f vrne true.
@@ -176,7 +186,13 @@ let apply_sequence f x n = ()
  - : int list = [4; 5]
  ---------- *)
 
-let filter f l = ()
+let filter f l = 
+	let rec filter_aux f l acc =
+		match l with
+		| [] -> reverse acc
+		| hd :: tl -> if f hd = true then filter_aux f tl (hd::acc)
+						else filter_aux f tl acc
+	in filter_aux f l []
 
 (* Funkcija "exists f l" sprejme seznam l in vrne true če obstaja 
 element
@@ -189,7 +205,10 @@ element
  - : bool = false
  ---------- *)
 
-let exists f l = ()
+let rec exists f l = 
+	match l with
+	| [] -> false
+	| hd :: tl -> if f hd = true then true else exists f tl
 
 (* Funkcija "first f none_value l" sprejme seznam l in vrne prvi element seznama,
  za katerega funkcija f vrne true, če takšnega elementa ni, pa vrne none_value.
@@ -201,7 +220,9 @@ let exists f l = ()
  - : int = 0
  ---------- *)
 
-let first f none_value l = ()
+let rec first f none_value = function
+	| [] -> none_value
+	| hd :: tl -> if f hd = true then hd else first f none_value tl
   
 (* Severnjaki napadajo Medbrezje. Kot vrhovni čarodej poznaš zaporedje urokov s katerimi
  lahko Medbrezje zaščitiš pred napadom, zaporedje urokov pa je predstavljeno v seznamu oblike
@@ -230,7 +251,46 @@ let first f none_value l = ()
  - : (string * string) list = [("Merlin", ""); ("Frodo", "Renounce"); ("Atijam", "");
   ("Mr Duck", "Protect"); ("Kylo Ren", "Banish"); ("Snoop Dogg", "Blaze")]
  ----------*)
+ 
+(* MOJA REŠITEV, delujoča *)
+let sum_spells spells =
+	let rec sum_spells_aux spells acc = 
+		match spells with
+		| [] -> acc
+		| hd :: tl -> let (_, a2) = hd in
+						sum_spells_aux tl (a2 + acc)
+	in sum_spells_aux spells 0
+ 
+let able_protectors1 spells wizards = 
+	let rec able_protectors_aux spells wizards acc = 
+		match wizards with
+		| [] -> reverse acc
+		| hd :: tl -> let (wizard, ability) = hd in
+						let total_power = sum_spells spells in 
+							if ability >= total_power then able_protectors_aux spells tl (wizard :: acc)
+								else able_protectors_aux spells tl acc
+		in able_protectors_aux spells wizards []
 
-let able_protectors spells wizards = ()
+		
+(* URADNA REŠITEV *)
+let able_protectors spells wizards = 
+	let (_, spell_values) = unzip spells in
+	let sequence_cost = fold_left_no_acc (+) (0::0::spell_values) in (* Odspredaj dodamo 0::0::, saj si ne želimo failwith*)
+	let can_cast (_, wizard_ability) = (wizard_ability >= sequence_cost) in
+	let mighty_wizards = filter can_cast wizards in
+	let (mighty_wizard_names, _) = unzip_tlrec mighty_wizards in
+	mighty_wizard_names
 
-let fails_on spells wizards = ()
+(* URADNA REŠITEV *)
+let fails_on spells wizards = 
+	let rec gets_stuck spells wizard_ability =
+		match spells with
+		| [] -> ""
+		| (spell_name, spell_value)::tl ->
+		  if wizard_ability >= spell_value
+		  then gets_stuck tl (wizard_ability - spell_value)
+		  else spell_name
+	in
+	let (wizard_names, wizard_abilities) = unzip wizards in
+	let stuck_spells = map (gets_stuck spells) wizard_abilities in
+	zip wizard_names stuck_spells
