@@ -111,20 +111,31 @@ def quicksort(a):
 #easy way
 
 def kth_element1(a, k):
-    return quicksort(a)[k-1]
+    return quicksort(a)[k+1]
 
-#NAPAKA!
 #harder way
 
+#def kth_element_part(a, start, end, k):
+#    if start < end:
+#        meja = pivot_list(a, start, end)
+#        if a[meja] == a[k]:
+#            return a[k]
+#        elif a[meja] > a[k]:
+#            kth_element_part(a, start, meja - 1, k)
+#        else:
+#            kth_element_part(a, meja + 1, end, k - meja - 1)
+
 def kth_element_part(a, start, end, k):
-    meja = pivot_list(a, start, end)
-    if meja == a[k]:
-        return a[k]
-    elif meja > a[k]:
-        kth_element_part(a, start, meja - 1, k)
+    if start < end:
+        meja = pivot_list(a, start, end)
+        if k < meja:
+            return kth_element_part(a, start, meja - 1, k)
+        elif k > meja:
+            return kth_element_part(a, meja + 1, end, k - meja - 1)
+        else:
+            return a[meja]
     else:
-        kth_element_part(a, meja + 1, end, k - meja - 1)
-    
+        return a[start]
 def kth_element(a, k):
     return kth_element_part(a, 0, len(a) - 1, k)
     
