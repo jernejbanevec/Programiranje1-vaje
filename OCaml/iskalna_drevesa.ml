@@ -59,16 +59,22 @@ let rec size = function
    # follow [Right;Left;Right;Right] test_tree;;
    - : int option = None
    ---------- *)
-
+   
 type direction = Left | Right
-
+	
 let rec follow directions t = 
 	match (directions, t) with
 	| (_, Empty) -> None
 	| ([], Node (l, y, d)) -> Some y
 	| (Left::tl, Node(l, y, d)) -> follow tl l
-	| (Right::tl, Node(l, y, d)) -> follow tl d
+	| (Right::tl, Node(l, y, d)) -> follow tl d 
 	
+	(* PODOBNA REŠITEV*)
+(* let rec follow directions t = 
+	match (directions, t) with
+	| ([], Node(l, y, d)) -> Some y
+	| (_, Empty) -> None
+	| (hd :: tl, Node(l, y, d)) -> if hd = Left then follow tl l else follow tl d *)	
 
 (* Funkcija "prune directions t"  [direction list -> 'a tree -> 'a tree option]
    poišče vozlišče v drevesu glede na navodila, ter izbriše poddrevo, ki se
@@ -90,9 +96,21 @@ let rec prune directions t =
 		| None -> None
 		| Some new_l -> Some (Node (new_l, y, d)))
 	| (Right::tl, Node(l, y, d)) -> 
-		(match prune tl l with
+		(match prune tl d with
 		| None -> None
-		| Some new_l -> Some (Node (l, y, new_l)))	
+		| Some new_l -> Some (Node (l, y, new_l)))
+   
+   (* PODOBNA REŠITEV, PO MOJEM MNENJU BOLJŠA *)
+(* let rec prune directions t =
+	match (directions, t) with
+	| ([], Node (l, y, d)) -> Some (Empty)
+	| (a, Empty) -> None
+	| (Left :: [], Node (l, y, d)) -> Some (Node (Empty, y, d))
+	| (Right :: [], Node (l, y, d)) -> Some (Node (l, y, Empty))
+	| (hd :: tl, Node (l, y, d)) -> 
+		(match hd with
+		| Left -> prune tl l
+		| Right -> prune tl d) *)
 		
 		(* KADAR MATCHE GNEZDIMO UPORABLJAMO ŠE DODATNE OKLEPAJE*)
 
@@ -195,8 +213,13 @@ let rec member2 x = function
    # [11;6;7;0;2;5] |> bst_of_list |> is_bst;;
    - : bool = true
    ---------- *)
-
-let bst_of_list l = ()
+   
+let bst_of_list l = 
+	let rec bst_aux l acc =
+		match l with 
+		| [] -> acc
+		| hd :: tl -> if member hd acc = false then insert hd acc else bst_aux tl acc
+	in bst_aux l Empty
 
 (* Sestavi funkcijo "tree_sort l" ['a list -> 'a list], ki uredi seznam l.
    ----------
@@ -204,7 +227,12 @@ let bst_of_list l = ()
    - : string list = ["a"; "b"; "c"; "d"; "e"; "f"]
    ---------- *)
 
-let tree_sort l = ()
+let tree_sort l = 
+	let rec tree_sort_aux l acc =
+		match l with
+		| [] -> list_of_tree acc
+		| hd :: tl -> tree_sort_aux tl (insert hd acc)
+	in tree_sort_aux l Empty
 
 (* Funkcija "succ bst" ['a tree -> 'a option] vrne naslednjika korena drevesa,
    če obstaja. Torej za drevo oblike bst = Node(l, x, r) vrne najmanjši element
@@ -218,9 +246,20 @@ let tree_sort l = ()
    - : int option = None
    ---------- *)
 
-let succ bst = ()
+let succ = function
+	| Empty -> None
+	| Node (l, y, d) -> if member (y+1) d then Some (y+1) else None
 
-let pred bst = ()
+let pred bst = 
+	let rec max = function
+		| Empty -> None
+		| Node (_, x, Empty) -> Some x
+		| Node (l, y, d) -> max d
+	in
+	match bst with
+	| Empty -> None
+	| Node (l, y, d) -> max l
+
 
 (* Na predavanjih ste omenili dva načina brisanja elementov iz drevesa.
    Prvi uporablja "succ", drugi pa "pred".
@@ -235,7 +274,10 @@ let pred bst = ()
    Node (Node (Empty, 6, Empty), 11, Empty))
    ---------- *)
 
-let rec delete x bst = ()
+let rec delete x = function
+  | Empty -> Empty
+  | Node(l, y, r) as t->
+    if 
 
 (* Dodatna možnost je, da spremenimo tip s katerim predstaviljamo drevo.
    Definiraj nov tip drevesa, ki poleg podatka, levega in desnega poddrevesa
@@ -290,4 +332,4 @@ let unphantomize pt = ()
     nov tip vozlišč, ki poleg podatka hrani tudi ključ podatka, in definiraj
     nekatere od funkcij "member", "insert", "dict_of_list", ... tako da
     ustrezajo obnašanju slovarjev.
-*)
+*) 
