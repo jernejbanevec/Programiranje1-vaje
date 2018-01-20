@@ -246,9 +246,20 @@ let tree_sort l =
    - : int option = None
    ---------- *)
 
-let succ = function
+let succ bst =
+	let rec min = function
 	| Empty -> None
-	| Node (l, y, d) -> if member (y+1) d then Some (y+1) else None
+	| Node (Empty, x, _) -> Some x
+	| Node (l, y, d) -> min l
+	in
+	match bst with
+	| Empty -> None
+	| Node (l, y, d) -> min d
+   
+   (* MOJA; MOGOČE NAPAČNA VERZIJA*)
+(*let succ = function
+	| Empty -> None
+	| Node (l, y, d) -> if member (y+1) d then Some (y+1) else None *)
 
 let pred bst = 
 	let rec max = function
@@ -273,20 +284,27 @@ let pred bst =
    Node (Node (Node (Empty, 0, Empty), 2, Empty), 5,
    Node (Node (Empty, 6, Empty), 11, Empty))
    ---------- *)
-
+   
 let rec delete x = function
   | Empty -> Empty
   | Node(l, y, r) as t->
-    if 
+    if x < y then Node(delete x l, y, r)
+	else if x > y then Node(l, y, delete x r) 
+	else 
+		match (succ t) with
+		| None -> l
+		| Some c -> Node (l, c, delete c r)
 
-(* Dodatna možnost je, da spremenimo tip s katerim predstaviljamo drevo.
+(* Dodatna možnost je, da spremenimo tip s katerim predstavljamo drevo.
    Definiraj nov tip drevesa, ki poleg podatka, levega in desnega poddrevesa
    hrani še dodatno informacijo o stanju "state", ki je lahko "Exists" če
    vozlišče upoštevamo in pa "Ghost" če je vozlišče v drevesu le še delitveno. *)
 
 type state = Exists | Ghost
 
-type 'a phantom_tree = unit
+type 'a phantom_tree = 
+	| P_Empty
+	| P_Node of 'a phantom_tree * 'a * 'a phantom_tree * state
 
 (* Funkcija "phantomize t" ['a tree -> 'a phantom_tree], ki navadnemu drevesu
    priredi fantomsko drevo.
@@ -305,10 +323,34 @@ type 'a phantom_tree = unit
    P_Node (P_Node (P_Empty, 3, P_Empty, Ghost), 4, P_Empty, Exists), Exists)
    ---------- *)
 
-let rec phantomize t = ()
+(*let rec phantomize = function
+	| Empty -> P_Empty
+	| Node (l, y, d) -> P_Node (phantomize l, y, phantomize d, Exists)*)
+	
+let rec phantomize = function
+  | Empty -> P_Empty
+  | Node(l, x, r) ->
+    let p_l = phantomize l in
+    let p_r = phantomize r in
+    P_Node(p_l, x, p_r, Exists)
 
-let rec kill x pt = ()
-
+(*let rec kill x = function
+	| P_Empty -> P_Empty
+	| P_Node(l, y, d, s) -> 
+		if x > y then P_Node(l, y, kill x d, s) 
+		else if x < y then P_Node(kill x l, y, d, s) 
+		else P_Node(l, y, d, Ghost) *)
+		
+let rec kill x = function
+  | P_Empty -> P_Empty
+  | P_Node(p_l, y, p_r, s) ->
+    if x < y then
+      P_Node(kill x p_l, y, p_r, s)
+    else if x > y then
+      P_Node(p_l, y, kill x p_r, s)
+    else
+      P_Node(p_l, y, p_r, Ghost)	
+	
 (* Funkcija "unphantomize pt" ['a phantom_tree -> 'a tree], ki fantomskemu
    drevesu priredi navadno drevo, ki vsebuje le vozlišča, ki še obstajajo.
    Vrstni red vozlišč v končnem drevesu ni pomemben.
@@ -318,8 +360,14 @@ let rec kill x pt = ()
    - : int tree = Node (Node (Node (Empty, 2, Empty), 6, Empty), 11, Empty)
    ---------- *)
 
-let unphantomize pt = ()
-
+let unphantomize pt =
+	let rec list_phantom = function
+		| P_Empty -> []
+		| P_Node(l, y, d, Ghost) -> (list_phantom l) @ (list_phantom d)
+		| P_Node(l, y, d, Exists) -> (list_phantom l) @ [y] @ (list_phantom d)
+	in
+	pt |> list_phantom |> bst_of_list
+	
 (*========== Ideje za dodatne vaje ==========*)
 (*
 1.) Priredi funkciji "insert" in "member" za fantomsko drevo.
