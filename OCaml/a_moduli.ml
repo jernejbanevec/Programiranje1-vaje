@@ -32,7 +32,6 @@
  https://people.mpi-sws.org/~dreyer/tor/papers/reynolds.pdf
  *)
 
-
 (* Kompleksna števila so zahtevnejša. Pričnimo z Nat. *)
 
 
@@ -41,7 +40,7 @@
    množenje. Hkrati naj vsebuje pretvorbe iz in v OCamlov "int" tip.*)
 
 module type NAT = sig
-    type t
+    type t 
     val eq   : t -> t -> bool
     val zero : t
 	val add : t -> t -> t
@@ -132,10 +131,12 @@ module type COMPLEX = sig
     val zero : t
 	val one : t
 	val i : t
-	val neg : t
-	val konj : t
+	val neg : t -> t
+	val konj : t -> t
 	val add : t -> t -> t
 	val mult : t -> t -> t
+	val div : t -> t -> t
+	val inv : t -> t
   end
 
 (* Napiši kartezično implementacijo kompleksnih števil (torej z = x + iy).
@@ -143,32 +144,63 @@ module type COMPLEX = sig
  *)
 
 
- 
-
 module Cartesian : COMPLEX = struct
   type t = {re : float; im : float}
   let eq x y = x.re = y.re && x.im = y.im
   let zero = {re = 0.; im = 0.}
   let one = {re = 1.; im = 0.}
   let i = {re = 0.; im = 1.}
-  let neg x = {re = 0. -. x.re; im = 0. -. x.im}
-  let konj x = {re = x.re; im = -. x.im}
+  let neg x = {re = (0. -. 1.) *. x.re; im = (0. -. 1.) *. x.im}
+  let konj x = {re = x.re; im = (0. -. 1.) *. x.im}
   let add x y = {re = x.re +. y.re; im = x.im +. y.im}
-  let mult = failwith "later"
+  let mult x y = {re = x.re *. y.re -. x.im *. y.im; im = x.im *. y.re +. x.re *. y.im}
+  let div x y =
+		let delitelj = y.re *. y.re +. y.im *. y.im in
+		let re = (x.re *. y.re +. x.im *. y.im) /. delitelj
+		and im = (x.im *. y.re -. x.re *. y.im) /. delitelj
+		in {re; im}
+  let inv = div one
 end
- 
+
 
 
 (* Sedaj napiši še polarno implementacijo kompleksnih števil (torej z = r e^(i*fi) ).
    Seštevanje je v polarnih koordinatah zahtevnejše, zato najprej napiši druge reči. *)
    
-(*
+(* arg = kot, magn = r*)
+   
 module Polar : COMPLEX = struct
   type t = {magn : float; arg : float}
-  let pi = 2. *. acos 0.
+  let pi = 2. *. acos 0. (* acos, asin, atan vračajo rezultate v radianih *)
   let rad deg = (deg /. 180.) *. pi
   let deg rad = (rad /. pi) *. 180.
-  let eq x y =
-  ...
+  let eq x y = 
+		x.magn = y.magn && (mod_float x.arg 360. = mod_float y.arg 360.)
+  let zero = {magn = 0.; arg = 0.}
+  let one = {magn = 1.; arg = 0.}
+  let i = {magn = 1.; arg = 90.}
+  let konj x = {magn = x.magn ; arg = (0. -. 1.) *. x.arg}
+  let neg x = {magn = x.magn ; arg = pi +. x.arg}
+  let mult x y = {magn = x.magn *. y.magn ; arg = x.arg +. y.arg}
+  let div x y = {magn = x.magn /. y.magn ; arg = x.arg -. y.arg}
+  let inv = div one
+  let arg re im =
+	let rad =
+		if re > 0. then atan (im /. re)
+		else if re < 0. && im >= 0. then atan (im /. re) +. pi
+		else if re < 0. && im < 0. then  atan (im /. re) -. pi
+		else if re = 0. && im > 0. then pi /. 2.
+		else if re = 0. && im < 0. then -.(pi /. 2.)
+		else 0.
+    in deg rad
+  let magn re im = sqrt (re *. re +. im *. im)
+  (* to formulo za seštevanje polarnih vektorjev lahko dobimo na stran stack exchange 
+  https://math.stackexchange.com/questions/1365622/adding-two-polar-vectors *)
+  let add x y =
+    let square x = x *. x in
+    let magn = sqrt (square x.magn +. square y.magn +. 2. *. x.magn *. y.magn *. cos (y.arg -. x.arg))
+    and arg = x.arg +.
+              atan2 (y.magn *. sin (y.arg -. x.arg))
+                (x.magn +. y.magn *. cos (y.arg -. x.arg)) in
+    {magn; arg}
 end
- *)

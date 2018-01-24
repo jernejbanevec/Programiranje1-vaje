@@ -5,6 +5,8 @@
    S pomočjo te funkcije lahko kasneje testiraš algoritme za urejanje.
    let l = (randlist 100 100) in selection_imperative_list l = List.sort compare l;;
  *)
+ 
+(* TA FUNKCIJA MAX NE DOSEŽE, VRAČA ŠTEVILA DO MAX-1*)
 let rec randlist len max = 
 	if len <= 0 then []
 	else Random.int max :: randlist (len - 1) max
@@ -47,11 +49,15 @@ let rec ins_sort l = List.fold_left (fun acc x -> insert x acc) [] l
    najmanjši element seznama "l" in "l_without_z" ne vsebuje prve ponovitve
    elementa "z". *)
    
-let rec min_and_rest l = 
-	match l with
+let min_and_rest = function
 	| [] -> None
-	| x :: xs -> 
-
+	| (x :: xs) as l -> 
+		let rec delete_min x = function
+			| [] -> []
+			| (hd :: tl) as t -> if hd = x then tl else hd :: delete_min x tl
+		in
+		let glava = List.nth (ins_sort (l)) 0 in
+		Some (glava, delete_min glava l)
 
 (* Urejanje z izbiranjem poteka tako, da hranimo seznam "l" ločen v 
    dveh podseznamih. Prvi seznam vsebuje že urejen del seznama, drugi 
@@ -61,7 +67,13 @@ let rec min_and_rest l =
 
 (* Z uporabo "min_and_rest" napiši rekurzivno funkcijo, ki ureja z 
    izbiranjem. *)
-let rec selection_sort l = failwith "todo"
+   
+let selection_sort l = 
+	let rec selection_sort_aux l acc =
+		match min_and_rest l with
+		| None -> List.rev acc
+		| Some (urejen, neurejeni) -> selection_sort_aux neurejeni (urejen :: acc)
+	in selection_sort_aux l []
 
 
 (* Pri delu z tabelami (array) namesto seznami, lahko urejanje z izbiranjem
@@ -74,7 +86,9 @@ let rec selection_sort l = failwith "todo"
    urejenega dela). Postopek končamo, ko meja doseže konec tabele. *)
 
 (* Napiši funkcijo "swap a i j", ki zamenja "a.(i)" in "a.(j)". *)
-let swap a i j = failwith "todo"
+let swap a i j =
+	let boundary_sorted = a.(i) in
+	a.(i) <- a.(j) ; a.(j) <- boundary_sorted
 
 (* Napiši funkcijo "index_min a lower upper", ki izračuna index najmanjšega
    elementa v "a" med indeksoma "lower" in "upper".
