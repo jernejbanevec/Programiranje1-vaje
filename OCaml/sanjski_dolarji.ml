@@ -32,15 +32,23 @@ let denominations = [1; 4; 7; 13; 28; 52; 91; 365]
    Namig: Iskanje primera ni tako preprosto. Del lahko izpustite dokler ne
    implementirate natančne rešitve, ki jo nato primerjate z požrešno.
 *)
+(* let denominations = [1; 4; 7; 13; 28; 52; 91; 365] *)
 
-let rec bills_greedy n = failwith "todo"
+let bills_greedy n = 
+	let rec bills_greedy_aux n acc =
+		match n with
+		| 0 -> acc
+		| a -> let najvecji = List.find ((>=)a)(List.rev denominations) in bills_greedy_aux (a - najvecji) (acc+1)
+	in bills_greedy_aux n 0
+
 
 (* 2.i) Opišite in analizirajte rekurzivni algoritem, ki za dani k izračuna
    najmanjši možni nabor bankovcev, potrebnih za vračanje k sanjskih dolarjev.
    (Na tej točki hitrost algoritma ni pomembna.)
 *)
 
-let rec bills_rec n = failwith "todo"
+let rec bills_rec n = 
+	
 
 
 (* 2.ii) Narišite drevo rekurzivnih klicov za n=5 in ugotovite kateri

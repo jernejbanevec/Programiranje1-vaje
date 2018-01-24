@@ -97,11 +97,20 @@ let swap a i j =
    
    index_min [|0; 2; 9; 3; 6|] 2 4 = 4 
 *)
-let index_min a lower upper = failwith "todo"
+let index_min a lower upper =
+	let haha = ref lower in
+	for i = lower to upper do
+		if a.(i) < a.(!haha) then
+			haha := i
+	done;
+	!haha
 
 (* Konstruiraj urejanje z izbiro na mestu. *)
-let selection_imperative a = failwith "todo"
-
+let selection_imperative a = 
+	let upper = (Array.length a) - 1 in
+		for i = 0 to upper do
+			swap a i (index_min a i upper)
+	done
 (* Za testiranje urejanja tabel lahko funkcijo pretvoriš v funkcijo, ki 
    ureja sezname z uporabo "Array.of_list" in "Array.to_list". *)
-let selection_imperative_list l = failwith "todo"
+let selection_imperative_list l = Array.of_list(ins_sort(Array.to_list l))

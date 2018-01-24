@@ -26,6 +26,7 @@
 ##########################################################################
 
 #te funk "zamenjaj" pozneje nisem uporabil
+
 def zamenjaj(seznam, a, b):
     t = seznam.index(a)
     index_a = seznam.index(a)
@@ -35,16 +36,17 @@ def zamenjaj(seznam, a, b):
     seznam[index_b] = b
     return seznam
 
+#Spremenili psevdokodo iz visualga
+
 def pivot_list(a, start, end):
     pivot = a[start]
     storeIndex = start + 1
     for i in range (start + 1, end + 1):
         if a[i] < pivot:
             temp = a[i]
-            a[i] = a[storeIndex]
+            a[i] = a[storeIndex] # Tu lahko večrat element zamenjamo s samim sabo
             a[storeIndex] = temp
-            storeIndex += 1
-    
+            storeIndex += 1   
     a[start] = a[storeIndex - 1]
     a[storeIndex - 1] = pivot
     return storeIndex - 1
@@ -111,57 +113,25 @@ def quicksort(a):
 #easy way
 
 def kth_element1(a, k):
-<<<<<<< HEAD
-    return quicksort(a)[k+1]
-=======
     return quicksort(a)[k]
->>>>>>> 6b76cadbf7365a155aa81d62fc0c4ef199b1b564
+
 
 #harder way
-
-#def kth_element_part(a, start, end, k):
-<<<<<<< HEAD
-#    if start < end:
-#        meja = pivot_list(a, start, end)
-#        if a[meja] == a[k]:
-#            return a[k]
-#        elif a[meja] > a[k]:
-#            kth_element_part(a, start, meja - 1, k)
-#        else:
-#            kth_element_part(a, meja + 1, end, k - meja - 1)
-=======
-#    meja = pivot_list(a, start, end)
-#    if meja == a[k]:
-#        return a[k]
-#    elif meja > a[k]:
-#        kth_element_part(a, start, meja - 1, k)
-#    else:
-#        kth_element_part(a, meja + 1, end, k - meja - 1)
-
->>>>>>> 6b76cadbf7365a155aa81d62fc0c4ef199b1b564
 
 def kth_element_part(a, start, end, k):
     if start < end:
         meja = pivot_list(a, start, end)
+        print(meja)
+        print(a)
         if k < meja:
-<<<<<<< HEAD
             return kth_element_part(a, start, meja - 1, k)
         elif k > meja:
             return kth_element_part(a, meja + 1, end, k - meja - 1)
         else:
             return a[meja]
     else:
-        return a[start]
-=======
-            return kth_element_part(a, start, meja-1, k)
-        elif k > meja:
-            return kth_element_part(a, meja+1, end-1, k - meja - 1)
-        else:
-            return a[k]
-    else:
         return a[end]
-    
->>>>>>> 6b76cadbf7365a155aa81d62fc0c4ef199b1b564
+ 
 def kth_element(a, k):
     return kth_element_part(a, 0, len(a) - 1, k)
     

@@ -26,7 +26,7 @@ let vsem_zamenjaj_drugo_z_42 l =
 						vsem_zamenjaj_drugo_z_42_aux tl (nova_glava :: acc)
 	in vsem_zamenjaj_drugo_z_42_aux l []					
 							
-
+let vsem_zamenjaj_drugo_z_42_druga l = List.map (fun p -> zamenjaj_drugo p 42) l
 (* 1.4) Definirajte funkcijo, ki varno vrne glavo seznama v primeru, ko seznam ni prazen.
    Uporabite tip option.
    Primer: /glava [1; 2; 3] = Some 1/ *)
@@ -66,41 +66,63 @@ type 'a drevo = T of 'a * 'a drevo list
                                -1  t'  0
 
  *)
-
+ 
 let t = T(1, [])
-let t' = T(2, [t; t])
-let t'' = T(3, [T(-1, []); t' ; T(0, [])])
+let t' = T(2, [t;t])
+let t'' = T(3, [T(-1, []); t'; T(0, [])])
 
 (* 2.3) Definirajte funkcijo, ki vrne gozd rožnega drevesa. *)
 
 let vrni_gozd = function
-	| (_, g) -> g 
+	| T(_, g) -> g 
 
 (* 2.4) Definirajte funkcijo, ki izpiše vse vrednosti v rožnem drevesu celih števil.
    Števila naj bodo v ločenih vrsticah. Uporabite (print_int : int -> unit) in
    (print_newline : unit -> unit). *)
    
-(*let izpisi_vrednosti = *)
+   (* MOJA OPCIJA *)
+
+let rec izpisi_vrednosti = function
+	| T(a, []) -> print_int a
+	| T(a, gozd) -> 
+		List.map izpisi_vrednosti gozd ; print_int a 
+				
+(*let izpisi_vrednosti (T (root, forest)) =
+  let rec iter f = function
+    | [] -> ()
+    | x :: xs -> f x; iter f xs
+  in
+  print_endline (string_of_int root); iter print_int forest	*)
 	
 
 (* 2.5) Definirajte funkcijo, ki izračuna globino rožnega drevesa, t.j. dolžino
    najdaljše poti od korena do lista. *)
+
    
-let rec max_number_list l =
-    match l with 
+   
+let rec max_number_list = function
     |[] -> 0
     |x::[] -> x
     |x::xs -> max x (max_number_list xs)
 	
-let rec globina d = 
-	match d with
-	| (k, []) -> 1
-	| (k, g) -> 1 + max_number_list (List.map globina g)
+let rec globina = function
+	| T(k, []) -> 1
+	| T(k, g) -> 1 + max_number_list (List.map globina g)
 
 (* 2.6) Definirajte funkcijo, ki sestavi (poljubno) rožno drevo globine n.
    Vrednosti v korenih so poljubne. *)
-(*let globoko_drevo = failwith "dopolni me"
-
+   
+let rec globoko_drevo = function
+	| 1 -> T(Random.int 5, []) (* Vsako drevo je globine vsaj 1*)
+	| n -> T(Random.int 5, [globoko_drevo (n - 1)])
+	
+let globoko_drevo2 n =
+  let rec aux acc n =
+    if n > 0
+    then aux (T (Random.int 5, [acc])) (n-1)
+    else acc
+  in aux (T (Random.int 5, [])) (n-1)
+	
 (* 2.7) Definirajte funkcijo, ki sprejme funkcijo (f : 'b -> 'a -> 'b) in začetno vrednost (acc : 'b)
    in funkcijo f zloži [fold] preko drevesa (t : 'a drevo). Vrstni red pri tem ni pomemben.
 
@@ -112,4 +134,18 @@ let rec globina d =
    Opomba: kot ste videli na vajah, nekatere funkcije iz modula List,
    na primer List.map, niso repno rekurzivne, zato se jim raje
    izognite. *)
-let zlozi = failwith "dopolni me"*)
+
+(* V rests si shranjujemo vse gozdove, ki jih še moramo obdelati.*)   
+let zlozi (f : 'a -> 'b -> 'a) (b : 'a) (t : 'b drevo) =
+  let rec aux (acc : 'a) (rests : 'b drevo list list) =
+    match rests with
+    (* Preveri ali moramo obdelati še kakšen gozd. *)
+    | [] -> acc
+    | ts :: rests ->
+      (match ts with
+       (* Preveri ali je v gozdu še kakšno drevo. *)
+       | [] -> aux acc rests
+       | (Rose (root, forest)) :: ts ->
+         (* Zloži preko elementa in dodaj nov gozd na rests.*)
+         aux (f acc root) (forest :: ts :: rests))
+  in aux b [[t]]

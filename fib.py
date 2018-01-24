@@ -19,7 +19,7 @@ def fib(n):
 
 @lru_cache(maxsize=None)
 def fib_cache(n):
-    print(n)
+    #print(n) samo da vidim katare mi gre ponovno računat
     if n in [0,1]:
         return n
     else:
@@ -31,21 +31,52 @@ def fib_cache(n):
 # Definirajte rekurzivno memoizirano funkcijo fib brez uporabe dekoratorja.
 # Omejitev: Preseže največjo dovoljeno globino rekurzija za ~1000.
 
+rezultati = {}
 def fib_memo_rec(n):
-    rezultati = {}
-    if n not in rezultati:
-        y = fib(n)
+    if n in [0,1]:
+        return n
+    if n not in rezultati.keys():
+        y = fib_memo_rec(n-1) + fib_memo_rec(n-2)
         rezultati[n] = y
         return y
     else:
-        rezultati[n]
+        return rezultati[n]
 
 # Na katere podprobleme se direktno skicuje rekurzivna definicija fib?
 
 # Definirajte fib ki gradi rezultat od spodaj navzgor (torej računa in si zapomni
 # vrednosti od 1 proti n.)
-#def fib_memo_iter(n):
+
+def fib_memo_iter(n):
+    rezultati = {}
+    rezultati[0] = 0
+    rezultati[1] = 1
+    for i in range(2, n+1):
+        rezultati[i] = rezultati[i-1] + rezultati[i-2]
+    return rezultati[n]
 
 # Izboljšajte prejšnjo različico tako, da hrani zgolj rezultate, ki jih v
 # nadaljevanju nujno potrebuje.
+
+# MOJA OPCIJA
 #def fib_iter(n):
+#    rezultati = {}
+#    rezultati[0] = 0
+#    rezultati[1] = 1
+#    for i in range(2, n+1):
+#        rezultati[i] = rezultati[i-1] + rezultati[i-2]
+#        rezultati.pop(i-2, None)
+#    #print(rezultati)
+#    return rezultati[n]
+
+def fib_iter(n):
+    if n in [0,1]:
+        return n
+    else:
+        x_0 = 0
+        x_1 = 1
+        for i in range(2, n+1):
+            x = x_0 + x_1
+            x_0 = x_1
+            x_1 = x
+    return x_1
