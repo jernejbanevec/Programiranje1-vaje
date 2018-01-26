@@ -22,13 +22,13 @@ let rec vstavi_seznam sez drevo =
 (*d del*)	
 
 let preveri_skatle drevo = 
-	let koren = ref 0 in
+	let koren = ref 100000 in
 		let rec preveri_levo_aux drevo koren =
 			match drevo with
 			| List(sez) -> if List.exists ((<)!koren) sez then false else true
-			| Vozlisce(l, y, d) -> koren := y; preveri_levo_aux l koren && preveri_desno_aux d koren
+			| Vozlisce(l, y, d) -> if (y < !koren) then (koren := y; (preveri_levo_aux l koren) && (preveri_desno_aux d koren)) else false
 		and preveri_desno_aux drevo koren =
 			match drevo with
 			| List(sez) -> if List.exists ((>=)!koren) sez then false else true
-			| Vozlisce(l, y, d) -> koren := y; preveri_levo_aux l koren && preveri_desno_aux d koren 
+			| Vozlisce(l, y, d) -> if (y > !koren) then (koren := y; (preveri_levo_aux l koren) && (preveri_desno_aux d koren)) else false
 		in preveri_levo_aux drevo koren
